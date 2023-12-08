@@ -57,6 +57,10 @@ X, y = fetch_california_housing(return_X_y=True)
 
 # COMMAND ----------
 
+X
+
+# COMMAND ----------
+
 X.mean(axis=0)
 
 # COMMAND ----------
@@ -113,6 +117,7 @@ print(y_discrete)
 # COMMAND ----------
 
 def objective(params):
+    print(params)
     classifier_type = params['type']
     del params['type']
     if classifier_type == 'svm':

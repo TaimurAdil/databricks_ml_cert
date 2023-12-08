@@ -92,6 +92,18 @@ train_df, test_df = airbnb_df.randomSplit([.8, .2], seed=42)
 
 # COMMAND ----------
 
+from pyspark.ml.feature import StringIndexer
+
+df = spark.createDataFrame(
+    [(0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c")],
+    ["id", "category"])
+
+indexer = StringIndexer(inputCol="category", outputCol="categoryIndex")
+indexed = indexer.fit(df).transform(df)
+indexed.show()
+
+# COMMAND ----------
+
 from pyspark.ml.feature import OneHotEncoder, StringIndexer
 
 categorical_cols = [field for (field, dataType) in train_df.dtypes if dataType == "string"]
