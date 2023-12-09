@@ -198,7 +198,7 @@ from mlflow.tracking.client import MlflowClient
 client = MlflowClient()
 model_version_details = client.get_model_version(name=model_name, version=1)
 
-model_version_details.status
+model_version_details
 
 # COMMAND ----------
 
@@ -227,10 +227,14 @@ client.update_registered_model(
 
 # COMMAND ----------
 
+model_details.version
+
+# COMMAND ----------
+
 client.update_model_version(
     name=model_details.name,
-    version=model_details.version,
-    description="This model version was built using OLS linear regression with sklearn."
+    version=2,
+    description="Description of model version 2"
 )
 
 # COMMAND ----------
@@ -263,9 +267,15 @@ time.sleep(10) # In case the registration is still pending
 
 # COMMAND ----------
 
+# client.transition_model_version_stage(
+#     name=model_details.name,
+#     version=model_details.version,
+#     stage="Production"
+# )
+
 client.transition_model_version_stage(
     name=model_details.name,
-    version=model_details.version,
+    version=2,
     stage="Production"
 )
 
@@ -280,11 +290,18 @@ client.transition_model_version_stage(
 
 # COMMAND ----------
 
-model_version_details = client.get_model_version(
+# model_version_details = client.get_model_version(
+#     name=model_details.name,
+#     version=model_details.version
+# )
+# print(f"The current model stage is: '{model_version_details.current_stage}'")
+
+model_detail = client.get_model_version(
     name=model_details.name,
     version=model_details.version
 )
-print(f"The current model stage is: '{model_version_details.current_stage}'")
+
+print(model_detail.version)
 
 # COMMAND ----------
 
@@ -301,7 +318,7 @@ print(f"The current model stage is: '{model_version_details.current_stage}'")
 
 import mlflow.pyfunc
 
-model_version_uri = f"models:/{model_name}/1"
+model_version_uri = f"models:/{model_name}/2"
 
 print(f"Loading registered model version from URI: '{model_version_uri}'")
 model_version_1 = mlflow.pyfunc.load_model(model_version_uri)
@@ -408,6 +425,8 @@ client.transition_model_version_stage(
 model_version_infos = client.search_model_versions(f"name = '{model_name}'")
 new_model_version = max([model_version_info.version for model_version_info in model_version_infos])
 
+new_model_version
+
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-4fb5d7c9-b0c0-49d5-a313-ac95da7e0f91
@@ -458,7 +477,7 @@ client.transition_model_version_stage(
 
 client.delete_model_version(
     name=model_name,
-    version=1
+    version=3
 )
 
 # COMMAND ----------
@@ -474,7 +493,7 @@ client.delete_model_version(
 
 client.transition_model_version_stage(
     name=model_name,
-    version=2,
+    version=1,
     stage="Archived"
 )
 

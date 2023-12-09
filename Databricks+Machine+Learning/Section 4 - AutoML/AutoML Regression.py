@@ -14,7 +14,7 @@ schema = StructType([
   StructField("ocean_proximity", StringType(), True)
 ])
  
-housing_df = spark.read.format("csv").schema(schema).option("header", "true").load("/FileStore/housing.csv")
+housing_df = spark.read.format("csv").schema(schema).option("header", "true").load("/FileStore/tables/housing.csv")
 
 # COMMAND ----------
 

@@ -278,6 +278,10 @@ display(client.search_experiments())
 
 # COMMAND ----------
 
+run.info
+
+# COMMAND ----------
+
 experiment_id = run.info.experiment_id
 runs_df = mlflow.search_runs(experiment_id)
 
@@ -299,7 +303,7 @@ runs[0].data.metrics
 
 # COMMAND ----------
 
-runs[0].info.run_id
+runs[0].info.run_name
 
 # COMMAND ----------
 

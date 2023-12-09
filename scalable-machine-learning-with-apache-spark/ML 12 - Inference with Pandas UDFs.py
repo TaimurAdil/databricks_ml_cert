@@ -125,6 +125,10 @@ display(prediction_df)
 
 # COMMAND ----------
 
+
+
+# COMMAND ----------
+
 # DBTITLE 0,--i18n-e97526c6-ef40-4d55-9763-ee3ebe846096
 # MAGIC %md 
 # MAGIC
