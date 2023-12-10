@@ -99,7 +99,8 @@ df = spark.createDataFrame(
     ["id", "category"])
 
 indexer = StringIndexer(inputCol="category", outputCol="categoryIndex")
-indexed = indexer.fit(df).transform(df)
+indexed = indexer.fit(df)
+indexed = indexed.transform(df)
 indexed.show()
 
 # COMMAND ----------
@@ -109,6 +110,11 @@ from pyspark.ml.feature import OneHotEncoder, StringIndexer
 categorical_cols = [field for (field, dataType) in train_df.dtypes if dataType == "string"]
 index_output_cols = [x + "Index" for x in categorical_cols]
 ohe_output_cols = [x + "OHE" for x in categorical_cols]
+
+# string_indexer = StringIndexer(inputCols=categorical_cols, outputCols=index_output_cols, handleInvalid="skip")
+# ohe_encoder = OneHotEncoder(inputCols=index_output_cols, outputCols=ohe_output_cols)
+
+# COMMAND ----------
 
 string_indexer = StringIndexer(inputCols=categorical_cols, outputCols=index_output_cols, handleInvalid="skip")
 ohe_encoder = OneHotEncoder(inputCols=index_output_cols, outputCols=ohe_output_cols)
@@ -181,6 +187,10 @@ pipeline_model = pipeline.fit(train_df)
 # MAGIC ## Saving Models
 # MAGIC
 # MAGIC We can save our models to persistent storage (e.g. DBFS) in case our cluster goes down so we don't have to recompute our results.
+
+# COMMAND ----------
+
+DA.paths.working_dir
 
 # COMMAND ----------
 

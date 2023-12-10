@@ -51,8 +51,15 @@
 
 # COMMAND ----------
 
+spark
+
+# COMMAND ----------
+
 file_path = f"{DA.paths.datasets}/airbnb/sf-listings/sf-listings-2019-03-06-clean.delta/"
+# airbnb_df = spark.read.format("delta").load(file_path)
+
 airbnb_df = spark.read.format("delta").load(file_path)
+
 
 # COMMAND ----------
 
@@ -68,6 +75,9 @@ airbnb_df = spark.read.format("delta").load(file_path)
 # MAGIC **Question**: Why is it necessary to set a seed? What happens if I change my cluster configuration?
 
 # COMMAND ----------
+
+# train_df, test_df = airbnb_df.randomSplit([.8, .2], seed=42)
+# print(train_df.cache().count())
 
 train_df, test_df = airbnb_df.randomSplit([.8, .2], seed=42)
 print(train_df.cache().count())
@@ -156,7 +166,6 @@ lr = LinearRegression(featuresCol="bedrooms", labelCol="price")
 from pyspark.ml.feature import VectorAssembler
 
 vec_assembler = VectorAssembler(inputCols=["bedrooms"], outputCol="features")
-
 vec_train_df = vec_assembler.transform(train_df)
 
 # COMMAND ----------

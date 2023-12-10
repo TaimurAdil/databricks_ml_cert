@@ -265,7 +265,9 @@ client = MlflowClient()
 
 # COMMAND ----------
 
-display(client.search_experiments())
+exp = (client.search_experiments(filter_string="attribute.name like '%MLflow Tracking%'"))
+
+exp[0].experiment_id
 
 # COMMAND ----------
 

@@ -125,6 +125,10 @@ display(base_df)
 
 # COMMAND ----------
 
+display(base_df)
+
+# COMMAND ----------
+
 from pyspark.sql.functions import col, translate
 
 fixed_price_df = base_df.withColumn("price", translate(col("price"), "$,", "").cast("double"))

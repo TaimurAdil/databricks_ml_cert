@@ -49,6 +49,10 @@
 
 # COMMAND ----------
 
+DA.paths.datasets
+
+# COMMAND ----------
+
 file_path = f"{DA.paths.datasets}/airbnb/sf-listings/sf-listings-2019-03-06-clean.delta/"
 airbnb_df = spark.read.format("delta").load(file_path)
 train_df, test_df = airbnb_df.randomSplit([.8, .2], seed=42)
@@ -80,6 +84,10 @@ string_indexer = StringIndexer(inputCols=categorical_cols, outputCols=index_outp
 
 # COMMAND ----------
 
+string_indexer
+
+# COMMAND ----------
+
 # DBTITLE 0,--i18n-35e2f231-2ebb-4889-bc55-089200dd1605
 # MAGIC %md 
 # MAGIC
@@ -98,6 +106,10 @@ numeric_cols = [field for (field, dataType) in train_df.dtypes if ((dataType == 
 # Combine output of StringIndexer defined above and numeric columns
 assembler_inputs = index_output_cols + numeric_cols
 vec_assembler = VectorAssembler(inputCols=assembler_inputs, outputCol="features")
+
+# COMMAND ----------
+
+vec_assembler
 
 # COMMAND ----------
 
@@ -131,12 +143,13 @@ dt = DecisionTreeRegressor(labelCol="price")
 
 from pyspark.ml import Pipeline
 
+dt.setMaxBins(40)
 # Combine stages into pipeline
 stages = [string_indexer, vec_assembler, dt]
 pipeline = Pipeline(stages=stages)
 
 # Uncomment to perform fit
-# pipeline_model = pipeline.fit(train_df)
+pipeline_model = pipeline.fit(train_df)
 
 # COMMAND ----------
 

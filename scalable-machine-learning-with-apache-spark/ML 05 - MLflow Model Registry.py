@@ -233,8 +233,8 @@ model_details.version
 
 client.update_model_version(
     name=model_details.name,
-    version=2,
-    description="Description of model version 2"
+    version=model_details.version,
+    description="Description of model version 1"
 )
 
 # COMMAND ----------
@@ -318,7 +318,7 @@ print(model_detail.version)
 
 import mlflow.pyfunc
 
-model_version_uri = f"models:/{model_name}/2"
+model_version_uri = f"models:/{model_name}/1"
 
 print(f"Loading registered model version from URI: '{model_version_uri}'")
 model_version_1 = mlflow.pyfunc.load_model(model_version_uri)
@@ -477,7 +477,7 @@ client.transition_model_version_stage(
 
 client.delete_model_version(
     name=model_name,
-    version=3
+    version=1
 )
 
 # COMMAND ----------
@@ -508,7 +508,7 @@ client.transition_model_version_stage(
 
 # COMMAND ----------
 
-client.delete_registered_model(model_name)
+# client.delete_registered_model(model_name)
 
 # COMMAND ----------
 

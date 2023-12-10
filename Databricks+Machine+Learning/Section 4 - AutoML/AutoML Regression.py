@@ -43,6 +43,7 @@ train_df, test_df = housing_df.randomSplit([0.99, 0.01], seed=42)
 # COMMAND ----------
 
 from databricks import automl
+import mlflow
 
 # COMMAND ----------
 
@@ -65,6 +66,20 @@ model_uri = f"runs:/{summary.best_trial.mlflow_run_id}/model"
 predict = mlflow.pyfunc.spark_udf(spark, model_uri)
 pred_df = test_df.withColumn("prediction", predict(*test_df.drop("median_house_value").columns))
 display(pred_df)
+
+# COMMAND ----------
+
+# exp = mlflow.get_experiment(3939403010347566)
+runs = mlflow.search_runs(experiment_ids=[3939403010347566], filter_string="")
+runs
+
+# COMMAND ----------
+
+model_uri = f"runs:/{summary.best_trial.mlflow_run_id}/model"
+
+predict = mlflow.pyfunc.spark_udf(model_uri)
+# pred_df = test_df.withColumn("prediction", predict(*test_df.drop("median_house_value").columns))
+# display(pred_df)
 
 # COMMAND ----------
 

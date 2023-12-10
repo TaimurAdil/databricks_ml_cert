@@ -6,7 +6,7 @@
 # COMMAND ----------
 
 import pandas as pd
- 
+
 white_wine = pd.read_csv("/dbfs/databricks-datasets/wine-quality/winequality-white.csv", sep=";")
 red_wine = pd.read_csv("/dbfs/databricks-datasets/wine-quality/winequality-red.csv", sep=";")
 
@@ -177,6 +177,11 @@ feature_importances.sort_values('importance', ascending=False)
 
 # COMMAND ----------
 
+run_ids = mlflow.search_runs()
+run_ids
+
+# COMMAND ----------
+
 run_id = mlflow.search_runs(filter_string='tags.mlflow.runName = "untuned_random_forest"').iloc[0].run_id
 print(run_id)
 
@@ -184,9 +189,13 @@ print(run_id)
 
 model_name = "wine_quality"
 model_version = mlflow.register_model(f"runs:/{run_id}/random_forest_model", model_name)
- 
+
 # Registering the model takes a few seconds, so add a small delay
-time.sleep(15)
+# time.sleep(15)
+
+# COMMAND ----------
+
+
 
 # COMMAND ----------
 
@@ -195,8 +204,8 @@ from mlflow.tracking import MlflowClient
 client = MlflowClient()
 client.transition_model_version_stage(
   name=model_name,
-  version=model_version.version,
-  stage="Production",
+  version=2,
+  stage="Archived",
 )
 
 # COMMAND ----------
@@ -326,7 +335,7 @@ print(f'AUC: {roc_auc_score(y_test, model.predict(X_test))}')
 
 spark_df = spark.createDataFrame(X_train)
 # Replace <username> with your username before running this cell.
-table_path = "dbfs:/ankit.25587@hotmail.com/delta/wine_data"
+table_path = "dbfs:/databricks_cert001@outlook.com/delta/wine_data"
 # Delete the contents of this path in case this cell has already been run
 dbutils.fs.rm(table_path, True)
 spark_df.write.format("delta").save(table_path)

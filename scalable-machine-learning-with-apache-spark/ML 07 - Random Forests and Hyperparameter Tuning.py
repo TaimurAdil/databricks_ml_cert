@@ -112,6 +112,14 @@ print(rf.explainParams())
 
 # COMMAND ----------
 
+rf.maxDepth
+
+# COMMAND ----------
+
+rf.numTrees
+
+# COMMAND ----------
+
 from pyspark.ml.tuning import ParamGridBuilder
 
 param_grid = (ParamGridBuilder()

@@ -178,6 +178,11 @@ df.limit(10).toPandas()
 
 # COMMAND ----------
 
+de_pandas = df.toPandas()
+de_pandas
+
+# COMMAND ----------
+
 # DBTITLE 0,--i18n-279e3325-b121-402b-a2d0-486e1cc26fc0
 # MAGIC %md 
 # MAGIC
