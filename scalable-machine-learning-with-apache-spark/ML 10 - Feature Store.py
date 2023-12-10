@@ -140,6 +140,10 @@ display(numeric_features_df)
 
 # COMMAND ----------
 
+table_name
+
+# COMMAND ----------
+
 fs.create_table(
     name=table_name,
     primary_keys=["index"],

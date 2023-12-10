@@ -80,6 +80,13 @@ display(inference_data_df)
 
 # COMMAND ----------
 
+model_feature_lookups = [FeatureLookup(table_name=table_name, lookup_key="wine_id")]
+model_feature_lookups
+# training_set = fs.create_training_set(inference_data_df, model_feature_lookups, label="quality", exclude_columns="wine_id")
+training_set = fs.create_training_set(inference_data_df, model_feature_lookups, label="quality", exclude_columns="wine_id")
+
+# COMMAND ----------
+
 def load_data(table_name, lookup_key):
     # In the FeatureLookup, if you do not provide the `feature_names` parameter, all features except primary keys are returned
     model_feature_lookups = [FeatureLookup(table_name=table_name, lookup_key=lookup_key)]
