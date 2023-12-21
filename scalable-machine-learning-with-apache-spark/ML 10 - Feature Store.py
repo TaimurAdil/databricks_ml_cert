@@ -254,7 +254,10 @@ fs.get_table(table_name).description
 # COMMAND ----------
 
 ## inference data -- index (key), price (target) and a online feature (make up a fictional column - diff of review score in a month) 
-inference_data_df = airbnb_df.select("index", "price", (rand() * 0.5-0.25).alias("score_diff_from_last_month"))
+# inference_data_df = airbnb_df.select("index", "price", (rand() * 0.5-0.25).alias("score_diff_from_last_month"))
+# display(inference_data_df)
+
+inference_data_df = airbnb_df.select("index", "price")
 display(inference_data_df)
 
 # COMMAND ----------

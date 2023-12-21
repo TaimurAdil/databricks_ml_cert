@@ -194,6 +194,11 @@ search_space = {
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC "SparkTrials" is designed to parallelize computations for single-machine ML models such as scikit-learn. For models created with distributed ML algorithms such as MLlib or Horovod, do not use "SparkTrials". In this case the model building process is automatically parallelized on the cluster and you should use the default Hyperopt class Trials.
+
+# COMMAND ----------
+
 from hyperopt import fmin, tpe, Trials
 import numpy as np
 import mlflow
@@ -210,7 +215,7 @@ best_hyperparam = fmin(fn=objective_function,
                        rstate=np.random.default_rng(42))
 
 # Retrain model on train & validation dataset and evaluate on test dataset
-with mlflow.start_run():
+with mlflow.start_run(nested=True) as run:
     best_max_depth = best_hyperparam["max_depth"]
     best_num_trees = best_hyperparam["num_trees"]
     estimator = pipeline.copy({rf.maxDepth: best_max_depth, rf.numTrees: best_num_trees})
@@ -246,3 +251,121 @@ DA.cleanup()
 # MAGIC Apache, Apache Spark, Spark and the Spark logo are trademarks of the <a href="https://www.apache.org/">Apache Software Foundation</a>.<br/>
 # MAGIC <br/>
 # MAGIC <a href="https://databricks.com/privacy-policy">Privacy Policy</a> | <a href="https://databricks.com/terms-of-use">Terms of Use</a> | <a href="https://help.databricks.com/">Support</a>
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## deal with string values as feature
+
+# COMMAND ----------
+
+from pyspark.sql.types import *
+schema = StructType().add("id","integer").add("name","string").add("qualification","string").add("age", "integer").add("gender", "string").add("passed", "integer")
+#create data
+data = [
+    (1,'John',"B.A.", 20, "Male", 1),
+    (2,'Martha',"B.Com.", 20, "Female", 1),
+    (3,'Mona',"B.Com.", 21, "Female", 1),
+    (4,'Harish',"B.Sc.", 22, "Male", 1),
+    (5,'Jonny',"B.A.", 22, "Male", 0),
+    (6,'Maria',"B.A.", 23, "Female", 1),
+    (7,'Monalisa',"B.A.", 21, "Female", 0)
+]
+
+# COMMAND ----------
+
+#create dataframe
+df = spark.createDataFrame(data, schema=schema)
+#columns of dataframe
+df.columns
+
+# COMMAND ----------
+
+#import required libraries
+from pyspark.ml.feature import StringIndexer
+
+qualification_indexer = StringIndexer(inputCol="qualification", outputCol="qualificationIndex")
+#Fits a model to the input dataset with optional parameters.
+df = qualification_indexer.fit(df).transform(df)
+df.show()
+
+# COMMAND ----------
+
+gender_indexer = StringIndexer(inputCol="gender", outputCol="genderIndex")
+#Fits a model to the input dataset with optional parameters.
+df = gender_indexer.fit(df).transform(df)
+df.show()
+
+# COMMAND ----------
+
+from pyspark.ml.feature import OneHotEncoder
+
+# COMMAND ----------
+
+#onehotencoder to qualificationIndex
+onehotencoder_qualification_vector = OneHotEncoder(inputCol="qualificationIndex", outputCol="qualification_vec")
+df = onehotencoder_qualification_vector.fit(df).transform(df)
+df.show()
+
+# COMMAND ----------
+
+#onehotencoder to genderIndex
+onehotencoder_gender_vector = OneHotEncoder(inputCol="genderIndex", outputCol="gender_vec")
+df = onehotencoder_gender_vector.fit(df).transform(df)
+df.show()
+
+# COMMAND ----------
+
+inputCols = [
+ 'age',
+ 'qualification_vec',
+ 'gender_vec'
+]
+outputCol = "features"
+df_va = VectorAssembler(inputCols = inputCols, outputCol = outputCol)
+df = df_va.transform(df)
+df.select(['features']).toPandas().head(5)
+
+# COMMAND ----------
+
+#create the structure of schema
+schema = StructType().add("id","integer").add("name","string").add("qualification","string").add("age", "integer").add("gender", "string").add("passed", "integer")
+
+#create data
+data = [
+    (1,'John',"B.A.", 20, "Male", 1),
+    (2,'Martha',"B.Com.", 20, "Female", 1),
+    (3,'Mona',"B.Com.", 21, "Female", 1),
+    (4,'Harish',"B.Sc.", 22, "Male", 1),
+    (5,'Jonny',"B.A.", 22, "Male", 0),
+    (6,'Maria',"B.A.", 23, "Female", 1),
+    (7,'Monalisa',"B.A.", 21, "Female", 0)
+]
+df = spark.createDataFrame(data, schema=schema)
+df.show()
+
+# COMMAND ----------
+
+#Convert qualification and gender columns to numeric
+qualification_indexer = StringIndexer(inputCol="qualification", outputCol="qualificationIndex")
+gender_indexer = StringIndexer(inputCol="gender", outputCol="genderIndex")
+
+#Convert qualificationIndex and genderIndex
+onehot_encoder = OneHotEncoder(inputCols=["qualificationIndex", "genderIndex"], outputCols=["qualification_vec", "gender_vec"])
+
+#Merge multiple columns into a vector column
+vector_assembler = VectorAssembler(inputCols=['age', 'qualification_vec', 'gender_vec'], outputCol='features')
+#Create pipeline and pass it to stages
+pipeline = Pipeline(stages=[
+           qualification_indexer, 
+           gender_indexer,
+           onehot_encoder,
+           vector_assembler
+])
+#fit and transform
+df_transformed = pipeline.fit(df).transform(df)
+df_transformed.show()
+
+# COMMAND ----------
+
+
