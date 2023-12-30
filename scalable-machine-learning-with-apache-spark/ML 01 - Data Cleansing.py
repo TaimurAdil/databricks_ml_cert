@@ -152,11 +152,11 @@ display(fixed_price_df)
 
 # COMMAND ----------
 
-display(fixed_price_df.describe())
+display(fixed_price_df.describe("host_is_superhost"))
 
 # COMMAND ----------
 
-display(fixed_price_df.summary())
+display(fixed_price_df.summary("75%"))
 
 # COMMAND ----------
 

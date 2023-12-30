@@ -114,6 +114,10 @@ fs = feature_store.FeatureStoreClient()
 
 # COMMAND ----------
 
+help(fs.register_table)
+
+# COMMAND ----------
+
 # DBTITLE 0,--i18n-90998fdb-87ed-4cdd-8844-fbd59ac5631f
 # MAGIC %md 
 # MAGIC
@@ -130,6 +134,10 @@ fs = feature_store.FeatureStoreClient()
 # MAGIC * **`schema`**- Feature table schema. Note that either **`schema`** or **`features_df`** must be provided.
 # MAGIC * **`description`**- Description of the feature table
 # MAGIC * **`partition_columns`**- Column(s) used to partition the feature table.
+
+# COMMAND ----------
+
+airbnb_df.select(["index"])
 
 # COMMAND ----------
 
@@ -231,6 +239,10 @@ fs.get_table(table_name).description
 
 # COMMAND ----------
 
+display(fs.read_table(table_name))
+
+# COMMAND ----------
+
 # DBTITLE 0,--i18n-1df7795c-1a07-47ae-92a8-1c5f7aec75ae
 # MAGIC %md 
 # MAGIC
@@ -271,6 +283,22 @@ display(inference_data_df)
 
 # COMMAND ----------
 
+help(fs.create_training_set)
+
+# COMMAND ----------
+
+# training_set_dummy = fs.create_training_set(inference_data_df, model_feature_lookups, label="price", exclude_columns="index")
+
+# inference_data_df_dummy = airbnb_df.select("index", "price")
+inference_data_df_dummy = airbnb_df.select("index", "price", (rand() * 0.5-0.25).alias("score_diff_from_last_month"))
+# airbnb_df.select("index", "price")
+model_feature_lookups = [FeatureLookup(table_name=table_name, lookup_key="index")]
+training_set = fs.create_training_set(df=inference_data_df_dummy, feature_lookups=model_feature_lookups, label="price", exclude_columns="index")
+
+display(training_set.load_df().toPandas())
+
+# COMMAND ----------
+
 def load_data(table_name, lookup_key):
     model_feature_lookups = [FeatureLookup(table_name=table_name, lookup_key=lookup_key)]
 
@@ -308,16 +336,17 @@ suffix = DA.unique_name("-")
 model_name = f"feature-store-airbnb_{suffix}"
 print(f"Model Name: {model_name}")
 
-try:
-    # Deleting model if already created
-    client.delete_registered_model(model_name)
-except:
-    None
+# try:
+#     # Deleting model if already created
+#     client.delete_registered_model(model_name)
+# except:
+#     None
 
 # COMMAND ----------
 
 # Disable model autologging and instead log explicitly via the FeatureStore
-mlflow.sklearn.autolog(log_models=False)
+# mlflow.sklearn.autolog()
+mlflow.sklearn.autolog()
 
 def train_model(X_train, X_test, y_train, y_test, training_set, fs):
     ## fit and log model
@@ -330,15 +359,15 @@ def train_model(X_train, X_test, y_train, y_test, training_set, fs):
         mlflow.log_metric("test_mse", mean_squared_error(y_test, y_pred))
         mlflow.log_metric("test_r2_score", r2_score(y_test, y_pred))
         
-        fs.log_model(
-            model=rf,
-            artifact_path="feature-store-model",
-            flavor=mlflow.sklearn,
-            training_set=training_set,
-            registered_model_name=model_name,
-            input_example=X_train[:5],
-            signature=infer_signature(X_train, y_train)
-        )
+        # fs.log_model(
+        #     model=rf,
+        #     artifact_path="feature-store-model",
+        #     flavor=mlflow.sklearn,
+        #     training_set=training_set,
+        #     registered_model_name=model_name,
+        #     input_example=X_train[:5],
+        #     signature=infer_signature(X_train, y_train)
+        # )
 
 train_model(X_train, X_test, y_train, y_test, training_set, fs)
 

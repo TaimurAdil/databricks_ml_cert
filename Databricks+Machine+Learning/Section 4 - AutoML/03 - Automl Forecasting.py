@@ -28,6 +28,10 @@ logging.getLogger("py4j").setLevel(logging.WARNING)
 
 # COMMAND ----------
 
+help(databricks.automl.forecast)
+
+# COMMAND ----------
+
 summary = databricks.automl.forecast(df, target_col='cases', time_col='date', horizon=30, frequency="d", primary_metric='mdape', output_database="default", timeout_minutes=15)
 
 # COMMAND ----------

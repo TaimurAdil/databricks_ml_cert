@@ -47,6 +47,10 @@ summary = automl.classify(train_df, target_col="income", timeout_minutes=5)
 
 # COMMAND ----------
 
+help(automl.classify)
+
+# COMMAND ----------
+
 print(summary)
 
 # COMMAND ----------
@@ -65,6 +69,10 @@ model = mlflow.pyfunc.load_model(model_uri)
 predictions = model.predict(X_test)
 test_pdf["income_predicted"] = predictions
 display(test_pdf)
+
+# COMMAND ----------
+
+help(mlflow.pyfunc.spark_udf)
 
 # COMMAND ----------
 

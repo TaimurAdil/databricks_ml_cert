@@ -292,6 +292,10 @@ display(dbutils.fs.ls(f"{DA.paths.working_dir}/neighbourhood_cleansed=Bayview/")
 
 # COMMAND ----------
 
+display(_sqldf)
+
+# COMMAND ----------
+
 # DBTITLE 0,--i18n-61faa23f-d940-479c-95fe-5aba72c29ddf
 # MAGIC %md 
 # MAGIC

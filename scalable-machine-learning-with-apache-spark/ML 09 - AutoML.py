@@ -91,6 +91,8 @@ from databricks import automl
 
 summary = automl.regress(train_df, target_col="price", primary_metric="rmse", timeout_minutes=5, max_trials=10)
 
+summary = automl.regress(train_df, target_col="price", timeout_minutes=5, max_trials=10)
+
 # COMMAND ----------
 
 # DBTITLE 0,--i18n-57d884c6-2099-4f34-b840-a4e873308ffe

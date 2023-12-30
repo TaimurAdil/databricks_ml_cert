@@ -51,6 +51,10 @@ summary = automl.regress(train_df, target_col="median_house_value", timeout_minu
 
 # COMMAND ----------
 
+# summary = automl.regress(train_df, target_col="median_house_value", primary_metric="rmse", max_trials=2, timeout_minutes=5)
+
+# COMMAND ----------
+
 print(summary)
 
 # COMMAND ----------
@@ -69,15 +73,15 @@ display(pred_df)
 
 # COMMAND ----------
 
-# exp = mlflow.get_experiment(3939403010347566)
-runs = mlflow.search_runs(experiment_ids=[3939403010347566], filter_string="")
+# exp = mlflow.get_experiment(1383502404232165)
+runs = mlflow.search_runs(experiment_ids=[1383502404232165], filter_string="")
 runs
 
 # COMMAND ----------
 
 model_uri = f"runs:/{summary.best_trial.mlflow_run_id}/model"
 
-predict = mlflow.pyfunc.spark_udf(model_uri)
+predict = mlflow.pyfunc.spark_udf(spark, model_uri)
 # pred_df = test_df.withColumn("prediction", predict(*test_df.drop("median_house_value").columns))
 # display(pred_df)
 

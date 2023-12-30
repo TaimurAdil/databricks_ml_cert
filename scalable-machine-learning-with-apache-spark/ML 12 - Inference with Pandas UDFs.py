@@ -89,6 +89,10 @@ spark_df = spark.createDataFrame(X_test)
 
 # COMMAND ----------
 
+display(spark_df)
+
+# COMMAND ----------
+
 # DBTITLE 0,--i18n-1cdc4475-f55f-4126-9d38-dedb19577f4e
 # MAGIC %md 
 # MAGIC

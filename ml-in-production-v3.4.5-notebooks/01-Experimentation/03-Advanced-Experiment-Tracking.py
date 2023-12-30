@@ -90,6 +90,7 @@ with mlflow.start_run(run_name="Signature Example") as run:
 
     # Log the model with signature and input example
     signature = infer_signature(X_train, pd.DataFrame(y_train))
+    print("Signature: ", signature)
     input_example = X_train.head(3)
     mlflow.sklearn.log_model(rf_model, "rf_model", signature=signature, input_example=input_example)
 
@@ -212,13 +213,18 @@ from hyperopt import fmin, tpe, hp, SparkTrials
 
 # Define objective function
 def objective(params):
-    model = RandomForestRegressor(n_estimators=int(params["n_estimators"]), 
-                                  max_depth=int(params["max_depth"]), 
-                                  min_samples_leaf=int(params["min_samples_leaf"]),
-                                  min_samples_split=int(params["min_samples_split"]))
-    model.fit(X_train, y_train)
-    pred = model.predict(X_train)
-    score = mean_squared_error(pred, y_train)
+    with mlflow.start_run():
+        mlflow.log_params(params)
+        model = RandomForestRegressor(n_estimators=int(params["n_estimators"]), 
+                                    max_depth=int(params["max_depth"]), 
+                                    min_samples_leaf=int(params["min_samples_leaf"]),
+                                    min_samples_split=int(params["min_samples_split"]))
+        model.fit(X_train, y_train)
+        pred = model.predict(X_train)
+        score = mean_squared_error(pred, y_train)
+
+        mlflow.log_metric('minimize mse: ', score)
+        mlflow.sklearn.log_model(model, "model")
 
     # Hyperopt minimizes score, here we minimize mse. 
     return score
@@ -246,12 +252,16 @@ search_space = {"n_estimators": hp.quniform("n_estimators", 100, 500, 5),
 # Set parallelism (should be order of magnitude smaller than max_evals)
 spark_trials = SparkTrials(parallelism=2)
 
-with mlflow.start_run(run_name="Hyperopt"):
+with mlflow.start_run(run_name="Hyperopt with Nested Models"):
     argmin = fmin(fn=objective,
                   space=search_space,
                   algo=tpe.suggest,
                   max_evals=16,
                   trials=spark_trials)
+
+# COMMAND ----------
+
+argmin
 
 # COMMAND ----------
 

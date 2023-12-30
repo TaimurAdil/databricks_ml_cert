@@ -162,10 +162,22 @@ print(f"Model Name: {model_name}")
 
 # COMMAND ----------
 
+help(mlflow.register_model)
+
+# COMMAND ----------
+
 run_id = run.info.run_id
 model_uri = f"runs:/{run_id}/model"
-
+print(model_uri," ",model_name)
 model_details = mlflow.register_model(model_uri=model_uri, name=model_name)
+
+# COMMAND ----------
+
+client.update_model_version(
+    name=model_details.name,
+    version=15,
+    description="Description of model version 1"
+)
 
 # COMMAND ----------
 
@@ -213,7 +225,7 @@ model_version_details
 
 client.update_registered_model(
     name=model_details.name,
-    description="This model forecasts Airbnb housing list prices based on various listing inputs."
+    description="Updated This model forecasts Airbnb housing list prices based on various listing inputs."
 )
 
 # COMMAND ----------
@@ -231,10 +243,14 @@ model_details.version
 
 # COMMAND ----------
 
+help(client.update_model_version)
+
+# COMMAND ----------
+
 client.update_model_version(
     name=model_details.name,
-    version=model_details.version,
-    description="Description of model version 1"
+    version=2,
+    description="Updated Description of model version 2"
 )
 
 # COMMAND ----------

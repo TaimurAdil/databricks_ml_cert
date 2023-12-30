@@ -87,6 +87,10 @@ training_set = fs.create_training_set(inference_data_df, model_feature_lookups, 
 
 # COMMAND ----------
 
+display(training_set.load_df())
+
+# COMMAND ----------
+
 def load_data(table_name, lookup_key):
     # In the FeatureLookup, if you do not provide the `feature_names` parameter, all features except primary keys are returned
     model_feature_lookups = [FeatureLookup(table_name=table_name, lookup_key=lookup_key)]
@@ -108,14 +112,14 @@ X_train.head()
 
 # COMMAND ----------
 
-from mlflow.tracking.client import MlflowClient
+# from mlflow.tracking.client import MlflowClient
  
-client = MlflowClient()
+# client = MlflowClient()
  
-try:
-    client.delete_registered_model("wine_model") # Delete the model if already created
-except:
-    None
+# try:
+#     client.delete_registered_model("wine_model") # Delete the model if already created
+# except:
+#     None
 
 # COMMAND ----------
 
@@ -128,7 +132,7 @@ mlflow.sklearn.autolog(log_models=False)
  
 def train_model(X_train, X_test, y_train, y_test, training_set, fs):
     ## fit and log model
-    with mlflow.start_run() as run:
+    with mlflow.start_run(run_name="Train model through Feature Store") as run:
  
         rf = RandomForestRegressor(max_depth=3, n_estimators=20, random_state=42)
         rf.fit(X_train, y_train)
@@ -153,7 +157,7 @@ batch_input_df = inference_data_df.drop("quality") # Drop the label column
  
 predictions_df = fs.score_batch("models:/wine_model/latest", batch_input_df) # Here we are using score_batch function of the Feature Store object 'fs' to make batch predictions on the model
                                   
-display(predictions_df["wine_id", "prediction"])
+display(predictions_df)
 
 # COMMAND ----------
 
@@ -212,10 +216,10 @@ def train_model(X_train, X_test, y_train, y_test, training_set, fs):
  
         fs.log_model(
             model=rf,
-            artifact_path="feature-store-model",
+            artifact_path="feature-store-model_updated",
             flavor=mlflow.sklearn,
             training_set=training_set,
-            registered_model_name="wine_model",
+            registered_model_name="wine_model_updated_name",
         )
  
 train_model(X_train, X_test, y_train, y_test, training_set, fs)
@@ -223,8 +227,12 @@ train_model(X_train, X_test, y_train, y_test, training_set, fs)
 # COMMAND ----------
 
 batch_input_df = inference_data_df.drop("quality") # Drop the label column
-predictions_df = fs.score_batch(f"models:/wine_model/latest", batch_input_df)
+predictions_df = fs.score_batch(f"models:/wine_model_updated_name/latest", batch_input_df)
 display(predictions_df["wine_id","prediction"])
+
+# COMMAND ----------
+
+help(fs.score_batch)
 
 # COMMAND ----------
 

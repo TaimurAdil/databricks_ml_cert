@@ -84,7 +84,9 @@ string_indexer = StringIndexer(inputCols=categorical_cols, outputCols=index_outp
 
 # COMMAND ----------
 
-string_indexer
+trans_df = string_indexer.fit(train_df)
+df = trans_df.transform(train_df)
+display(df)
 
 # COMMAND ----------
 
